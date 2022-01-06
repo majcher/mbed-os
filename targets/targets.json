@@ -2874,6 +2874,10 @@
             "MCU_STM32G0"
         ],
         "public": false,
+        "mbed_rom_start": "0x08000000",
+        "mbed_rom_size": "0x80000",
+        "mbed_ram_start": "0x20000000",
+        "mbed_ram_size": "0x24000",
         "extra_labels_add": [
             "STM32G0B1xE"
         ],
@@ -2883,6 +2887,18 @@
         "device_has_add": [
             "ANALOGOUT"
         ]
+    },
+    "NUCLEO_G0B1RE": {
+        "inherits": [
+            "MCU_STM32G0B1xE"
+        ],
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "detect_code": [
+            "0872"
+        ],
+        "device_name": "STM32G0B1RETx"
     },
     "MCU_STM32G0C1xE": {
         "inherits": [
