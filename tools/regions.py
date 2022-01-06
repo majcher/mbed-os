@@ -159,15 +159,10 @@ def merge_region_list(
                 "  Skipping %s as it is merged previously" % (region.name)
             )
 
-    # Hex file can have gaps, so no padding needed. While other formats may
-    # need padding. Iterate through segments and pad the gaps.
-    if format != ".hex":
-        # begin patching from the end of the first segment
-        _, begin = merged.segments()[0]
-        for start, stop in merged.segments()[1:]:
-            pad_size = start - begin
-            merged.puts(begin, padding * pad_size)
-            begin = stop + 1
+    if restrict_size is not None:
+        desired_size = int(restrict_size, 0)
+        # Rely on IntelHex to pad the binary as required
+        merged[merged.minaddr() + desired_size - 1] = merged.padding
 
     if not exists(dirname(destination)):
         makedirs(dirname(destination))
