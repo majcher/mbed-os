@@ -162,6 +162,12 @@ typedef enum {
     SYS_WKUP6 = PB_5,
     SYS_WKUP7 = PB_15,
 
+#ifdef DEVICE_CAN
+    /**** CAN pins ****/
+    CAN1_TD = PA_12,
+    CAN1_RD = PA_11,
+#endif
+
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
