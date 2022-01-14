@@ -17,12 +17,21 @@
  */
 
 #if !DEVICE_CAN
+#define SKIP_CAN_TEST
 #error [NOT_SUPPORTED] CAN API not supported for this target
-#elifndef CAN1_TD
+#endif
+
+#ifndef CAN1_TD
+#define SKIP_CAN_TEST
 #error [NOT_SUPPORTED] CAN1_TD pin name not defined for this target
-#elifndef CAN1_RD
+#endif
+
+#ifndef CAN1_RD
+#define SKIP_CAN_TEST
 #error [NOT_SUPPORTED] CAN1_RD pin name not defined for this target
-#else
+#endif
+
+#ifndef SKIP_CAN_TEST
 
 #include "utest/utest.h"
 #include "utest/utest_print.h"
@@ -142,4 +151,4 @@ int main()
     Harness::run(specification);
 }
 
-#endif // !DEVICE_CAN
+#endif // SKIP_CAN_TEST
