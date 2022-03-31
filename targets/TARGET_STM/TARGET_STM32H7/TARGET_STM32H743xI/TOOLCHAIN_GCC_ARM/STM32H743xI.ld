@@ -38,14 +38,29 @@ M_CRASH_DATA_RAM_SIZE = 0x100;
 #define VECTORS_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
 
 MEMORY
-{ 
+{
   FLASH (rx)     : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
   DTCMRAM (rwx)  : ORIGIN = NVIC_RAM_VECTOR_ADDRESS + VECTORS_SIZE, LENGTH = 128K - VECTORS_SIZE
   RAM (xrw)      : ORIGIN = MBED_RAM1_START, LENGTH = MBED_RAM1_SIZE
   RAM_D2 (xrw)   : ORIGIN = 0x30000000, LENGTH = 288K
   RAM_D3 (xrw)   : ORIGIN = 0x38000000, LENGTH = 64K
   ITCMRAM (xrw)  : ORIGIN = 0x00000000, LENGTH = 64K
+  EXTRAM (xrw)   : ORIGIN = 0xC0000000, LENGTH = 32M
+  EXTRAM1 (xrw)  : ORIGIN = 0xC0000000, LENGTH = 8M
+  EXTRAM2 (xrw)  : ORIGIN = 0xC0800000, LENGTH = 8M
+  EXTRAM3 (xrw)  : ORIGIN = 0xC1000000, LENGTH = 8M
+  EXTRAM4 (xrw)  : ORIGIN = 0xC1800000, LENGTH = 8M
 }
+
+
+/*
+EXTRAM addresses:
+
+B0: 0000000 - 07FFFFF
+B1: 0800000 - 0FFFFFF
+B2: 1000000 - 17FFFFF
+B3: 1800000 - 1FFFFFF
+*/
 
 /* Linker script to place sections and symbol values. Should be used together
  * with other linker script that defines memory regions FLASH and RAM.
@@ -119,7 +134,7 @@ SECTIONS
 
     __etext = .;
     _sidata = .;
-    
+
     .crash_data_ram :
     {
         . = ALIGN(8);
@@ -179,7 +194,7 @@ SECTIONS
         . = ALIGN(32);
         __uninitialized_end = .;
     } > RAM
-    
+
     .bss :
     {
         . = ALIGN(8);
@@ -233,4 +248,30 @@ SECTIONS
         *(.ethusbram)
 
     } >RAM_D2 AT> FLASH
+
+    .ext_ram (NOLOAD): {
+        . = ALIGN(8);
+        *(.extRam)
+    } > EXTRAM
+
+    .ext_ram_bank_1 (NOLOAD): {
+        . = ALIGN(8);
+        *(.extRamBank1)
+    } > EXTRAM1
+
+    .ext_ram_bank_2 (NOLOAD): {
+        . = ALIGN(8);
+        *(.extRamBank2)
+    } > EXTRAM2
+
+    .ext_ram_bank_3 (NOLOAD): {
+        . = ALIGN(8);
+        *(.extRamBank3)
+    } > EXTRAM3
+
+    .ext_ram_bank_4 (NOLOAD): {
+        . = ALIGN(8);
+        *(.extRamBank4)
+    } > EXTRAM4
+
 }
