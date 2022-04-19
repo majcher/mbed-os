@@ -36,6 +36,7 @@
 #include <stddef.h> /* for size_t */
 #include "mbed_toolchain.h"
 #include "lwipopts.h"
+#include "lwip_memcpy_aligned.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,7 +74,7 @@ extern "C" {
 
 /* Provide Thumb-2 routines for GCC to improve performance */
 #if defined(TOOLCHAIN_GCC) && defined(__thumb2__)
-    #define MEMCPY(dst,src,len)     thumb2_memcpy(dst,src,len)
+    #define MEMCPY(dst,src,len)     thumb2_aligned_memcpy(dst,src,len)
     #define LWIP_CHKSUM             thumb2_checksum
     /* Set algorithm to 0 so that unused lwip_standard_chksum function
        doesn't generate compiler warning */
