@@ -186,7 +186,7 @@ static void _can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz
     obj->CanHandle.Init.StdFiltersNbr = 128; // to be aligned with the handle parameter in can_filter
     obj->CanHandle.Init.ExtFiltersNbr = 64; // to be aligned with the handle parameter in can_filter
 #else
-    /* The number of Standard and Extended ID filters are initialized to the maximum possile extent 
+    /* The number of Standard and Extended ID filters are initialized to the maximum possile extent
      * for STM32G0x1, STM32G4 and STM32L5  platforms
     */
     obj->CanHandle.Init.StdFiltersNbr = 28; // to be aligned with the handle parameter in can_filter
@@ -245,13 +245,23 @@ void can_irq_free(can_t *obj)
 {
     CANName can = (CANName)obj->CanHandle.Instance;
     if (can == CAN_1) {
+#if (defined TARGET_STM32G0B1xE)
+        HAL_NVIC_DisableIRQ(TIM16_FDCAN_IT0_IRQn);
+        HAL_NVIC_DisableIRQ(TIM17_FDCAN_IT1_IRQn);
+#else
         HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
         HAL_NVIC_DisableIRQ(FDCAN1_IT1_IRQn);
+#endif
     }
 #if defined(FDCAN2_BASE)
     else if (can == CAN_2) {
+#if (defined TARGET_STM32G0B1xE)
+        HAL_NVIC_DisableIRQ(TIM16_FDCAN_IT0_IRQn);
+        HAL_NVIC_DisableIRQ(TIM17_FDCAN_IT1_IRQn);
+#else
         HAL_NVIC_DisableIRQ(FDCAN2_IT0_IRQn);
         HAL_NVIC_DisableIRQ(FDCAN2_IT1_IRQn);
+#endif
     }
 #endif
 #if defined(FDCAN3_BASE)
@@ -647,8 +657,8 @@ void can_irq_set(can_t *obj, CanIrqType type, uint32_t enable)
     }
 
     if (enable) {
-        /* The TXBTIE register controls the TX complete interrupt in FDCAN 
-         * and is only used in case of TX interrupts, Hence in case of enabling the 
+        /* The TXBTIE register controls the TX complete interrupt in FDCAN
+         * and is only used in case of TX interrupts, Hence in case of enabling the
          * TX interrupts the bufferIndexes of TXBTIE are to be set  */
 #ifdef TARGET_STM32H7
         // TXBTIE for STM32H7 is 2 bytes long
@@ -661,15 +671,29 @@ void can_irq_set(can_t *obj, CanIrqType type, uint32_t enable)
         HAL_FDCAN_DeactivateNotification(&obj->CanHandle, interrupts);
     }
 
+#if (defined TARGET_STM32G0B1xE)
+    NVIC_SetVector(TIM16_FDCAN_IT0_IRQn, (uint32_t)&FDCAN1_IT0_IRQHandler);
+    NVIC_EnableIRQ(TIM16_FDCAN_IT0_IRQn);
+    NVIC_SetVector(TIM17_FDCAN_IT1_IRQn, (uint32_t)&FDCAN1_IT1_IRQHandler);
+    NVIC_EnableIRQ(TIM17_FDCAN_IT1_IRQn);
+#else
     NVIC_SetVector(FDCAN1_IT0_IRQn, (uint32_t)&FDCAN1_IT0_IRQHandler);
     NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
     NVIC_SetVector(FDCAN1_IT1_IRQn, (uint32_t)&FDCAN1_IT1_IRQHandler);
     NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
+#endif
 #if defined(FDCAN2_BASE)
+#if (defined TARGET_STM32G0B1xE)
+    NVIC_SetVector(TIM16_FDCAN_IT0_IRQn, (uint32_t)&FDCAN2_IT0_IRQHandler);
+    NVIC_EnableIRQ(TIM16_FDCAN_IT0_IRQn);
+    NVIC_SetVector(TIM17_FDCAN_IT1_IRQn, (uint32_t)&FDCAN2_IT1_IRQHandler);
+    NVIC_EnableIRQ(TIM17_FDCAN_IT1_IRQn);
+#else
     NVIC_SetVector(FDCAN2_IT0_IRQn, (uint32_t)&FDCAN2_IT0_IRQHandler);
     NVIC_EnableIRQ(FDCAN2_IT0_IRQn);
     NVIC_SetVector(FDCAN2_IT1_IRQn, (uint32_t)&FDCAN2_IT1_IRQHandler);
     NVIC_EnableIRQ(FDCAN2_IT1_IRQn);
+#endif
 #endif
 #if defined(FDCAN3_BASE)
     NVIC_SetVector(FDCAN3_IT0_IRQn, (uint32_t)&FDCAN3_IT0_IRQHandler);
@@ -1005,7 +1029,7 @@ int can_write(can_t *obj, CAN_Message msg, int cc)
 int can_read(can_t *obj, CAN_Message *msg, int handle)
 {
     //FIFO selection cannot be controlled by software for STM32, default FIFO is 0, hence handle is not used
-    int rxfifo_default = DEFAULT_RXFIFO; 
+    int rxfifo_default = DEFAULT_RXFIFO;
     CAN_TypeDef *can = obj->CanHandle.Instance;
 
     // check FPM0 which holds the pending message count in FIFO 0
